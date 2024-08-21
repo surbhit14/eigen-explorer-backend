@@ -189,16 +189,16 @@ export async function getTvl(req: Request, res: Response) {
 		res.send({
 			...(withChange
 				? {
-						...(await combineTvlWithChange(
-							tvlRestaking as TvlWithChange,
-							tvlBeaconChain as TvlWithChange
-						))
-				  }
+					...(await combineTvlWithChange(
+						tvlRestaking as TvlWithChange,
+						tvlBeaconChain as TvlWithChange
+					))
+				}
 				: {
-						tvl:
-							(tvlRestaking as TvlWithoutChange) +
-							(tvlBeaconChain as TvlWithoutChange)
-				  })
+					tvl:
+						(tvlRestaking as TvlWithoutChange) +
+						(tvlBeaconChain as TvlWithoutChange)
+				})
 		})
 	} catch (error) {
 		handleAndReturnErrorResponse(req, res, error)
@@ -909,18 +909,18 @@ export async function getDeploymentRatio(req: Request, res: Response) {
 		const change24hPercent =
 			deploymentRatio24hAgo !== 0
 				? Math.round(
-						((currentDeploymentRatio - deploymentRatio24hAgo) /
-							deploymentRatio24hAgo) *
-							1000
-				  ) / 1000
+					((currentDeploymentRatio - deploymentRatio24hAgo) /
+						deploymentRatio24hAgo) *
+					1000
+				) / 1000
 				: 0
 		const change7dPercent =
 			deploymentRatio7dAgo !== 0
 				? Math.round(
-						((currentDeploymentRatio - deploymentRatio7dAgo) /
-							deploymentRatio7dAgo) *
-							1000
-				  ) / 1000
+					((currentDeploymentRatio - deploymentRatio7dAgo) /
+						deploymentRatio7dAgo) *
+					1000
+				) / 1000
 				: 0
 
 		res.send({
@@ -994,7 +994,7 @@ export async function getRestakingRatio(req: Request, res: Response) {
 				: 0
 
 		res.send({
-			total: currentRestakingRatio,
+			restakingRatio: currentRestakingRatio,
 			change24h: {
 				value: change24hValue,
 				percent: change24hPercent
@@ -1069,7 +1069,7 @@ async function doGetTvl(withChange: boolean) {
 				const strategyShares =
 					Number(
 						(BigInt(s.shares) * BigInt(sharesUnderlying.sharesToUnderlying)) /
-							BigInt(1e18)
+						BigInt(1e18)
 					) / 1e18
 
 				tvlStrategies[s.strategyKey] = strategyShares
@@ -1086,15 +1086,15 @@ async function doGetTvl(withChange: boolean) {
 				}
 			}
 		})
-	} catch (error) {}
+	} catch (error) { }
 
 	return {
 		tvlRestaking: withChange
 			? await calculateTvlChange(
-					tvlRestaking,
-					'metricStrategyHourly',
-					ethPrices
-			  )
+				tvlRestaking,
+				'metricStrategyHourly',
+				ethPrices
+			)
 			: tvlRestaking,
 		tvlStrategies,
 		tvlStrategiesEth: Object.fromEntries(tvlStrategiesEth.entries())
@@ -1136,16 +1136,16 @@ async function doGetTvlStrategy(strategy: `0x${string}`, withChange: boolean) {
 		if (strategyTokenPrice) {
 			tvlEth = tvl * strategyTokenPrice.eth
 		}
-	} catch (error) {}
+	} catch (error) { }
 
 	return {
 		tvl: withChange
 			? await calculateTvlChange(
-					tvl,
-					'metricStrategyHourly',
-					ethPrices,
-					strategy
-			  )
+				tvl,
+				'metricStrategyHourly',
+				ethPrices,
+				strategy
+			)
 			: (tvl as TvlWithoutChange),
 		tvlEth
 	}
@@ -2470,13 +2470,13 @@ async function calculateTotalChange(
 	const change24hPercent =
 		change24hValue !== 0
 			? Math.round((change24hValue / (total - change24hValue)) * precision) /
-			  precision
+			precision
 			: 0
 
 	const change7dPercent =
 		change7dValue !== 0
 			? Math.round((change7dValue / (total - change7dValue)) * precision) /
-			  precision
+			precision
 			: 0
 
 	return {
@@ -2704,7 +2704,7 @@ function calculateTvlForHistoricalRecord(
 					return (
 						total +
 						Number(strategyRecord.tvl) *
-							(ethPrices?.get(strategyRecord.strategyAddress) || 0)
+						(ethPrices?.get(strategyRecord.strategyAddress) || 0)
 					)
 				},
 				0
@@ -2758,19 +2758,19 @@ async function calculateMetricsForHistoricalRecord(
 			newOperators =
 				totalOperators !== undefined && totalOperators !== null
 					? (
-							intervalHourlyData[
-								lastRecordIndex
-							] as AggregateModelMap['metricAvsHourly']
-					  ).totalOperators
+						intervalHourlyData[
+						lastRecordIndex
+						] as AggregateModelMap['metricAvsHourly']
+					).totalOperators
 					: 0
 
 			newAvs =
 				totalAvs !== undefined && totalAvs !== null
 					? (
-							intervalHourlyData[
-								lastRecordIndex
-							] as AggregateModelMap['metricOperatorHourly']
-					  ).totalAvs
+						intervalHourlyData[
+						lastRecordIndex
+						] as AggregateModelMap['metricOperatorHourly']
+					).totalAvs
 					: 0
 		}
 	} else {
@@ -2783,16 +2783,16 @@ async function calculateMetricsForHistoricalRecord(
 		newOperators =
 			totalOperators !== undefined && totalOperators !== null
 				? (intervalHourlyData as AggregateModelMap['metricAvsHourly'][]).reduce(
-						(sum, record) => sum + record.changeOperators,
-						0
-				  )
+					(sum, record) => sum + record.changeOperators,
+					0
+				)
 				: 0
 
 		newAvs =
 			totalAvs !== undefined && totalAvs !== null
 				? (
-						intervalHourlyData as AggregateModelMap['metricOperatorHourly'][]
-				  ).reduce((sum, record) => sum + record.changeAvs, 0)
+					intervalHourlyData as AggregateModelMap['metricOperatorHourly'][]
+				).reduce((sum, record) => sum + record.changeAvs, 0)
 				: 0
 	}
 
